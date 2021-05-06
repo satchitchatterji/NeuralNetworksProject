@@ -1,5 +1,9 @@
-from processing_py import *
 
+
+
+
+from processing_py import *
+from random import uniform
 from extras import Vector
 from rocket import Rocket
 
@@ -13,6 +17,11 @@ class Scene:
 
 		self.gravity = Vector(0, 0.01)
 
+		self.target_size = 100
+		self.target_lims = (0, self.width-self.target_size)
+		self.target_pos = uniform(*self.target_lims)
+		self.target_center = Vector(self.target_pos, self.ground_height)
+
 	def add_rocket(self, rocket):
 		self.rocket = rocket
 
@@ -23,24 +32,29 @@ class Scene:
 		self.app.fill(*col)
 		self.app.rect(0, self.height-self.ground_height, self.width, self.ground_height)
 
+	def draw_target(self, col = (255, 0, 0)):
+		self.app.fill(*col)
+		self.app.rect(self.target_pos, self.height-self.ground_height, self.target_size, self.ground_height)
+
 	def draw(self):
 		self.draw_background()
 		self.draw_ground()
+		self.draw_target()
 		if self.rocket is not None:
 			self.rocket.update()
 			self.rocket.draw()
 		self.app.redraw()
-
+		
 		# find a safer way to do this maybe?
 		if self.app.isDead._flag:
 			exit()
 
 
-scene = Scene(800, 800)
+scene = Scene(1000, 1000)
 scene.gravity = Vector(0, 0.01)
 
 rocket = Rocket(scene)
-rocket.thrust_mag = 0.015
+rocket.thrust_mag = 0.02
 rocket.rotation_mag = 0.02
 
 while(True):
