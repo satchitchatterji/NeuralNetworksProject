@@ -1,6 +1,7 @@
 import os
 import math
 from random import uniform
+import numpy as np
 
 from extras import Vector
 class Rocket:
@@ -13,6 +14,7 @@ class Rocket:
 		self.thrust = Vector(0, 0)
 		self.rotation = 0
 		self.engine_on = False
+		self.count = 0
 		
 		self.consts = {}
 		self.consts["rotation_speed"] = 0.02
@@ -35,6 +37,20 @@ class Rocket:
 
 		self.reset_all()		
 		self.scene.add_rocket(self)
+  
+	def get_data(self):
+		return [self.count, self.pos, self.center_pos, self.vel, self.thrust, self.rotation, self.engine_on, self.scene.target_center] 
+
+	# saves data in file but we have to drive the roket ourselves and make it land (which is pretty hard). A valid landing should be labeled as 1
+	# and the other one is 0
+	def print_data(self, file):
+		data = self.get_data()
+		np.savetxt(file, [data], delimiter=",", fmt="%s")
+		self.count += 1
+  
+	def save_key_data(self):
+		if self.scene.app.key in ['w', 'q', 's', 'a', 'd', 'r']:
+			np.savetxt(self.scene.file_key, [self.scene.app.key], fmt="%s", newline=" ")
 
 	def get_start_pos(self, init = 'random'):
 		if init == 'center':
@@ -76,7 +92,8 @@ class Rocket:
 		# turn engine on and off
 		if self.scene.app.key == 'w':
 			self.engine_on = True
-		elif self.scene.app.key == ' ':
+
+		elif self.scene.app.key == 'q':
 			self.engine_on = False
 
 		# turn rotation off and on
@@ -89,6 +106,8 @@ class Rocket:
 
 		elif self.scene.app.key == 'r':
 			self.reset_all()
+
+		self.save_key_data()
 
 	def update_thrust(self):
 		if self.engine_on:

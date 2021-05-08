@@ -1,11 +1,9 @@
 
-
-
-
 from processing_py import *
 from random import uniform
 from extras import Vector
 from rocket import Rocket
+from datetime import datetime
 
 class Scene:
 	def __init__(self, width, height):
@@ -14,6 +12,7 @@ class Scene:
 		self.height = height
 		self.ground_height = 20
 		self.rocket = None
+		self.file_key = open("data_key.csv", 'a');
 
 		self.gravity = Vector(0, 0.01)
 
@@ -50,13 +49,19 @@ class Scene:
 			exit()
 
 
-scene = Scene(1000, 1000)
+scene = Scene(800, 800)
 scene.gravity = Vector(0, 0.01)
 
 rocket = Rocket(scene)
 rocket.thrust_mag = 0.02
 rocket.rotation_mag = 0.02
 
+#file = open("data.csv",'w')
+# print("Rocket data from " + (str)(datetime.now()), file=file)
+# print("Nr, posX, posY, centerX, centerY, velX, velY, thrustX, thrustY, rot, engine, targetX, targetY", file=file)
+
 while(True):
 	rocket.update()
 	scene.draw()
+	#rocket.print_data(file)
+ 
