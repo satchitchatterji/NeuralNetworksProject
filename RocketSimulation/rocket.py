@@ -1,42 +1,71 @@
 import os
 import math
 from random import uniform
-
 from extras import Vector
+from copy import copy
+
 class Rocket:
+
+	"""
+	A simplistic rocket model, that, given a Scene object,
+	can have a thrust and rotate. Its position can be intialised
+	at a known (x,y) position or randomly initialised within the
+	boundaries of the scene. 
+
+	"""
+
+	########## Initialisation ##########
+
 	def __init__(self, scene, start_pos = 'random'):
+
 		self.scene = scene
 
-		self.pos = Vector(0,0)
-		self.center_pos = Vector(0,0)		
-		self.vel = Vector(0, 0)
-		self.thrust = Vector(0, 0)
-		self.rotation = 0
-		self.engine_on = False
-		
-		self.consts = {}
-		self.consts["rotation_speed"] = 0.02
-		self.consts["thrust"] = 0.02
-		self.consts["init_lims_x"] = (0, self.scene.width)
-		self.consts["init_lims_y"] = (0, self.scene.height/2)
-		
-		
+		self.draw_pos = Vector(0,0) # the position where the rocket image is drawn (top left position)
+		self.center_pos = Vector(0,0) # the center position of the image (can be understood as the rocket's position)
+		self.vel = Vector(0, 0) # velocity vector of the rocket
+		self.thrust = Vector(0, 0) # thrust/acceleration vector of the rocket
+		self.rotation = 0 # current rotation angle (in radian) of the rocket, with respect to vertical
+		self.engine_on = False # whether or not the rocket is accelerating
+
+
+		# rocket image data, numbers are only wrt the image itself
 		self.rocket_img_path = os.getcwd()+'/rocket.png'
 		self.rocket_img = self.scene.app.loadImage(self.rocket_img_path)
 		self.img_height = 100
 		self.img_width = 0.7*self.img_height
 
-		self.consts["init_pos"] = self.get_start_pos(start_pos)
-
+		# fire image data, numbers are only wrt the image itself
 		self.fire_img_path = os.getcwd()+'/fire.png'
 		self.fire_img = self.scene.app.loadImage(self.fire_img_path)
 		self.fire_img_width = 0.25 * self.img_width
 		self.fire_img_height = 10/9 * self.fire_img_width
 
+		# a few constants that tend not to change over the lifetime of the rocket
+		# these need not be constants, but it makes sense that they are 
+		self.consts = {}
+		self.consts["rotation_speed"] = 0.02 # angular velocity is constant while turning
+		self.consts["thrust"] = 0.02 # acceleration is constant per time second
+		self.consts["init_lims_x"] = (0, self.scene.width) # initialization boundary (wrt width of scene)
+		self.consts["init_lims_y"] = (0, self.scene.height/2) # initialization boundary (wrt upper half of scene)
+		self.consts["init_pos"] = self.get_start_pos(start_pos) # get the initial position of the rocket
+
+		# reset position, velocity, thrust, rotation, and add self to scene
 		self.reset_all()		
 		self.scene.add_rocket(self)
 
+		# data accessible of rocket, see method self::get_data 
+		# for the list of values currently exported
+		self.data = {}
+
 	def get_start_pos(self, init = 'random'):
+		"""
+		Generates starting positon of rocket.
+		switch init:
+			case 'center': return (center of screen, placed upon ground)
+			case 'random': return (random, random) within init_limits
+			case type(init)==Vector: return init
+			default: return (0,0)
+		"""
 		if init == 'center':
 			return Vector(self.scene.width/2 - self.img_width/2, 
 						  self.scene.height - self.scene.ground_height - self.img_height)
@@ -44,53 +73,77 @@ class Rocket:
 			x = uniform(*self.consts["init_lims_x"]) - self.img_width/2
 			y = uniform(*self.consts["init_lims_y"])
 			return Vector(x, y)
+		elif type(init) == Vector:
+			return init
 		else:
 			return Vector(0,0)
 
-	def update_center_pos(self):
-		self.center_pos.x = self.pos.x + self.img_width/2
-		self.center_pos.y = self.pos.y + self.img_height/2
 
-	def update_fire_coords(self):
-		self.fire_x = 0.38*self.img_width - self.img_width/2
-		self.fire_y = 0.94*self.img_height - self.img_height/2
-
-	def reset_position(self):
-		self.pos = self.consts["init_pos"]
-		self.update_center_pos()
+	########## Reset object ##########
 
 	def reset_rotation(self):
+		"""
+		Set the rocket upright (vertical)
+		"""
 		self.rotation = 0
 
+	def reset_position(self):
+		"""
+		Re-place rocket wherever it was initially initialised
+		"""
+		self.draw_pos = self.consts["init_pos"]
+		self.update_center_pos()
+
 	def reset_movement(self):
+		"""
+		Reset acceleration, velocity, turn engine off
+		"""
 		self.thrust.zeros()
 		self.vel.zeros()
 		self.engine_on = False
 	
 	def reset_all(self):
+		"""
+		Resets position, movement, and rotation of rocket
+		"""
 		self.reset_position()
 		self.reset_movement()
 		self.reset_rotation()
 
-	def parse_key_input(self):
-		# turn engine on and off
-		if self.scene.app.key == 'w':
-			self.engine_on = True
-		elif self.scene.app.key == ' ':
-			self.engine_on = False
 
-		# turn rotation off and on
-		elif self.scene.app.key == 's':
-			pass # stops rotation
-		elif self.scene.app.key == 'a':
-			self.rotation -= self.consts["rotation_speed"]
-		elif self.scene.app.key == 'd':
-			self.rotation += self.consts["rotation_speed"]
+	########## Updation functions ##########
 
-		elif self.scene.app.key == 'r':
-			self.reset_all()
+	def update_center_pos(self):
+		"""
+		Update the center position of the rocket with respect to the
+		drawing position of the image onto the scene. This should be 
+		ideally done the opposite way, updating the draw position wrt
+		the center position, but this is the way it's done now. Since 
+		the center pos and draw pos are a contant distance (center of
+		the image and the top left), it doesn't really matter that much
+		in the long run, but may be updated in the future. 
+		"""
+		self.center_pos.x = self.draw_pos.x + self.img_width/2
+		self.center_pos.y = self.draw_pos.y + self.img_height/2
+
+	def update_fire_coords(self):
+		"""
+		Updates where the fire should be drawn with respect to the image.
+		These numbers are specific to the rocket.png and fire.png images.
+		"""
+		self.fire_x = 0.38*self.img_width - self.img_width/2
+		self.fire_y = 0.94*self.img_height - self.img_height/2
+
 
 	def update_thrust(self):
+		"""
+		Update the thrust of the rocket if the engine is on, else set the thrust
+		to zero. The magnitude of the thrust vector is constant in this simulation
+		but it does not have to be. Components are calculated with trig, as usual.
+		Because the y-position on screen gets larger the more towards the bottom
+		of the screen you go, the thrust is negative (we want the rocket to go
+		up the screen, so reduce its y-value over time).
+		"""
 		if self.engine_on:
 			self.thrust.x = -self.consts["thrust"]*math.cos(self.rotation+math.pi/2)
 			self.thrust.y = -self.consts["thrust"]*math.sin(self.rotation+math.pi/2)
@@ -98,23 +151,48 @@ class Rocket:
 			self.thrust.zeros()
 
 	def update_velocity(self):
+		"""
+		Update the velocity of the rocket. There are two forces that affect
+		the velocity of the rocket here: gravity and thrust. These accelerate
+		the rocket over time.
+		"""
 		self.vel += self.scene.gravity
 		self.vel += self.thrust
 
 	def update_position(self):
-		self.pos += self.vel
+		"""
+		Update the position of the rocket by adding on the velocity vector
+		for one time step.
+		"""
+		self.draw_pos += self.vel
 
-		if self.pos.y + self.img_height > self.scene.height - self.scene.ground_height:
-			self.pos.y = self.scene.height - self.scene.ground_height - self.img_height
+		# check for collision with the ground
+		# if so, reset velocity and thrust.
+		if self.draw_pos.y + self.img_height > self.scene.height - self.scene.ground_height:
+			self.draw_pos.y = self.scene.height - self.scene.ground_height - self.img_height
 			self.reset_movement()
-
+			# TODO: add collision notification/class boolean datamember called 'is_dead'
+		
 	def update(self):
-		self.parse_key_input()
+		"""
+		Functionally updates the acceleration, velocity and position of rocket.
+		"""
 		self.update_thrust()
 		self.update_velocity()
 		self.update_position()
 
+
+	########## Visualisation ##########
+
 	def draw(self):
+		"""
+		This function enables the rocket to be drawn on screen.
+
+		It is a little involved and needs a little knowledge of Processing 3
+		or the processing api being used to draw it, but let me know if you'd
+		like me to extend this comment to include more information about it,
+		or ask me directly if you're curious -satchit
+		"""
 		self.scene.app.pushMatrix()
 		self.update_center_pos()
 		self.scene.app.translate(self.center_pos.x, self.center_pos.y)
@@ -129,3 +207,23 @@ class Rocket:
 		self.scene.app.image(self.rocket_img, -self.img_width/2, -self.img_height/2, self.img_width, self.img_height)
 		self.scene.app.popMatrix()
 
+
+	########## Data export ##########
+
+	def get_data(self):
+		"""
+		Export the quasi-physical data of the rocket as a dictionary.
+		The variables being exported are self-explanitory 
+		"""
+		self.data['x_pos'] = self.center_pos.x
+		self.data['y_pos'] = self.center_pos.y
+		self.data['x_vel'] = self.vel.x
+		self.data['y_vel'] = self.vel.y
+		self.data['x_thrust'] = self.thrust.x
+		self.data['y_thrust'] = self.thrust.y
+		self.data['rotation'] = self.rotation
+		self.data['engine'] = self.engine_on
+		self.data['x_target'] = self.scene.target_center.x
+		self.data['y_target'] = self.scene.target_center.y
+
+		return self.data
