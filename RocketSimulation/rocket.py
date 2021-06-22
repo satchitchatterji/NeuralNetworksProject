@@ -92,11 +92,15 @@ class Rocket:
 		"""
 		self.rotation = 0
 
-	def reset_position(self):
+	def reset_position(self, init = 'random'):
 		"""
 		Re-place rocket wherever it was initially initialised
 		"""
-		self.draw_pos = self.consts["init_pos"]
+		if init == 'random':
+			self.draw_pos = self.get_start_pos()
+		else:
+			self.draw_pos = self.consts["init_pos"]
+		
 		self.update_center_pos()
 
 	def reset_movement(self):

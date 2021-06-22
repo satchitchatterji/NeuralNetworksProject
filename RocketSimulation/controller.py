@@ -49,6 +49,7 @@ class RocketController:
 		# since it does nothing at the start of
 		# a rocket simulation.
 		self.last_function = self.engine_off
+		self.last_key = ' '
 
 		#andreea pls add comments thx
 		self.physical_history = []
@@ -74,8 +75,15 @@ class RocketController:
 		self.rocket.rotation += self.rocket.consts["rotation_speed"]%math.pi
 		self.rocket.rotation = self.rocket.rotation % (2*math.pi)
 	
+	def reset_history(self):
+		self.physical_history = []
+		self.control_history = []
+
 	def reset(self):
-		self.rocket.reset_all()
+		if len(self.physical_history)>1:
+			self.rocket.reset_all()
+		self.reset_history()
+		self.last_function = self.engine_off
 
 	def control(self, key = None):
 		"""
@@ -114,6 +122,10 @@ class RocketController:
 		else:
 			pass
 
+		if key == 'r':
+			if self.control_history and self.control_history[-1] == 'r':
+				self.last_function = self.engine_off
+
 		self.last_function()
   
 		if self.save_history:
@@ -123,11 +135,12 @@ class RocketController:
 
 	def record_to_list(self, key):
 		self.physical_history.append(list(self.rocket.get_data().values()))
-		if key not in self.controls.keys():
-			key = 'p'
 		self.control_history.append(key)
 
 	def save_to_file(self, filename):
+		if len(self.physical_history)<10:
+			return
+
 		f = open(filename, 'w')
 		f.write(f'Success: {self.rocket.check_success()}\n')
 		f.write(",".join(list(self.rocket.get_data().keys())))
@@ -135,5 +148,19 @@ class RocketController:
 		for i in range(len(self.control_history)):
 			f.write(",".join(str(x) for x in self.physical_history[i]))
 			f.write(',')
-			f.write(self.control_history[i])
+
+			key = self.control_history[i]
+			if key not in self.controls.keys() or key == 'r':
+				key = 'p'
+
+			f.write(key)
 			f.write('\n')	
+		f.close()
+		print(f'Succesfully written to {filename}')
+		self.reset_history()
+
+
+		############### REMOVE THIS ###################
+		########### This is only for single player mode #########
+		if self.physical_control:
+			self.scene.init_target('random')

@@ -49,6 +49,7 @@ class Scene:
 			self.target_pos = 0
 
 		self.target_center = Vector(self.target_pos+self.target_size/2, self.height-self.ground_height) # center x-coord of target
+	
 	########## Rocket-specific functions ##########
 
 	def add_rocket(self, rocket):
