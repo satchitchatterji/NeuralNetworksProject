@@ -20,7 +20,7 @@ class Scene:
 
 	########## Initialisations ##########
 
-	def __init__(self, width, height):
+	def __init__(self, width, height, init_target_val = 'random'):
 		self.app = App(width, height)
 		self.width = width
 		self.height = height
@@ -31,14 +31,24 @@ class Scene:
 
 		self.target_size = 100 # width of target drawn to screen
 		self.target_lims = (0, self.width-self.target_size) # limits of where the target is initialised
-		self.target_pos = uniform(*self.target_lims) # generate initial target position
-		self.target_center = Vector(self.target_pos, self.ground_height) # center x-coord of target
+		self.init_target(init_target_val)
 
 		# decide whether or not to draw the rockets onto the screen
 		# if the control is automated, the movements will be far far
 		# faster if this is False
 		self.draw_rockets_to_screen = True
 
+	def init_target(self, init_val = 'random'):
+		if init_val == 'random':
+			self.target_pos = uniform(*self.target_lims) # generate initial target position	
+		elif type(init_val) == int:
+			self.target_pos = init_val
+			
+		else:
+			print('Target initialization failed, reverting to zero.')
+			self.target_pos = 0
+
+		self.target_center = Vector(self.target_pos+self.target_size/2, self.height-self.ground_height) # center x-coord of target
 	########## Rocket-specific functions ##########
 
 	def add_rocket(self, rocket):
@@ -59,6 +69,7 @@ class Scene:
 					rocket.draw()
 
 	########## Draw scene ##########
+
 	def draw_background(self):
 		"""
 		Draws draws background. For now, it is just black.
@@ -80,6 +91,7 @@ class Scene:
 		and width := target_size
 		"""
 		self.app.fill(*col)
+		self.app.ellipse(self.target_center.x, self.height-self.ground_height, 10,10)
 		self.app.rect(self.target_pos, self.height-self.ground_height, self.target_size, self.ground_height)
 
 
@@ -105,4 +117,3 @@ class Scene:
 		# Also find a safer way to do this maybe?
 		if self.app.isDead._flag:
 			exit()
-

@@ -1,3 +1,5 @@
+import math
+
 class RocketController:
 	"""
 	A controller class for a rocket object, passed in
@@ -50,19 +52,21 @@ class RocketController:
 	##### Control functions #####
 
 	def engine_on(self):
-		self.rocket.engine_on = True
+		self.rocket.control_engine(turn_on=True)
 	
 	def engine_off(self):
-		self.rocket.engine_on = False
+		self.rocket.control_engine(turn_on=False)
 	
 	def stop_rotation(self):
 		pass
 	
 	def rotate_left(self):
 		self.rocket.rotation -= self.rocket.consts["rotation_speed"]
-	
+		self.rocket.rotation = self.rocket.rotation % (2*math.pi)
+
 	def rotate_right(self):
-		self.rocket.rotation += self.rocket.consts["rotation_speed"]
+		self.rocket.rotation += self.rocket.consts["rotation_speed"]%math.pi
+		self.rocket.rotation = self.rocket.rotation % (2*math.pi)
 	
 	def reset(self):
 		self.rocket.reset_all()

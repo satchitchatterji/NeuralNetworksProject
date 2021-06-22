@@ -1,0 +1,66 @@
+
+
+
+
+
+
+
+
+Things to do:
+.) [x] tare out score (r::score-50), fix target printing
+.) Add comments, clean code [Satchit]
+0) [x] Add fuel guage [Satchit]
+1) [x] Include biases [Satchit]
+2) Different crossover scenarios [Andreea]
+3) Play with hyperparameters [Ruhi]
+4) Random rocket/target positions at each generation [Stefania]
+5) Different architectures
+.
+.
+.
+n) If nothing else, use this as training data for supervised model
+n+1) CNN/Other NN that takes in image, outputs control
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+List of Hyperparameters:
+
+- Number of rockets
+- Number of generations
+- Rocket::score() : distance vs velocity vs rotation importance (vs fuel?)
+- ControllerNetwork::calc_fitnesses() : sigma
+- ControllerNetwork::mutate_all() : rate
+- ControllerNetwork::mutate_all() : sigma
+- ControllerNetowrk::choose_parents() : type of crossover
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Steps for Training:
+
+[Essentially, just run train_evolution.py]
+1) Set Hyperparameters
+2) train_evolution.py: set rockets, generations
+3) Write log notes
+4) (optional) Set rocket/target init positions
+5) Run!
+6) tskmgr: kill Java panel, kill background py so your computer doesn't catch on fire
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Check Training:
+
+Data always saved after the last generation of training to directory tests/
+
+- Saved networks == "sorted_cn_list_{yearmonthdateTtime}.pickle"
+- Other saves "_____{yearmonthdateTtime}.txt"
+- Check best rockets:
+	- show_saved_controllers.py
+	- set n_rockets (number of top rockets to show)
+	- Run!
+
+- Check training scores:
+	- scratchpad.py
+	- For mean scores:
+		-open mean_scores_{yearmonthdateTtime}.txt
+	- For min scores:
+		-open min_scores_{yearmonthdateTtime}.txt

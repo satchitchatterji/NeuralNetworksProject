@@ -1,7 +1,8 @@
 import os
 import math
+import numpy as np
 from random import uniform
-from extras import Vector
+from extras import Vector, normalize
 from copy import copy
 
 class Rocket:
@@ -26,7 +27,9 @@ class Rocket:
 		self.thrust = Vector(0, 0) # thrust/acceleration vector of the rocket
 		self.rotation = 0 # current rotation angle (in radian) of the rocket, with respect to vertical
 		self.engine_on = False # whether or not the rocket is accelerating
+		self.fuel = 100 # the fuel in the rocket, the engine cannot turn on if 0
 
+		self.is_dead = False # if the rocket has crashed or landed, it is dead
 
 		# rocket image data, numbers are only wrt the image itself
 		self.rocket_img_path = os.getcwd()+'/rocket.png'
@@ -48,6 +51,7 @@ class Rocket:
 		self.consts["init_lims_x"] = (0, self.scene.width) # initialization boundary (wrt width of scene)
 		self.consts["init_lims_y"] = (0, self.scene.height/2) # initialization boundary (wrt upper half of scene)
 		self.consts["init_pos"] = self.get_start_pos(start_pos) # get the initial position of the rocket
+		self.consts["fuel_consumption"] = 0.5; # amount of fuel consumed per time step
 
 		# reset position, velocity, thrust, rotation, and add self to scene
 		self.reset_all()		
@@ -106,12 +110,21 @@ class Rocket:
 		"""
 		Resets position, movement, and rotation of rocket
 		"""
+		self.is_dead = False
+		self.fuel = 100
 		self.reset_position()
 		self.reset_movement()
 		self.reset_rotation()
 
 
 	########## Updation functions ##########
+
+	def control_engine(self, turn_on=True):
+		if turn_on:
+			if self.fuel>0:
+				self.engine_on = True
+		else:
+			self.engine_on = False
 
 	def update_center_pos(self):
 		"""
@@ -147,6 +160,12 @@ class Rocket:
 		if self.engine_on:
 			self.thrust.x = -self.consts["thrust"]*math.cos(self.rotation+math.pi/2)
 			self.thrust.y = -self.consts["thrust"]*math.sin(self.rotation+math.pi/2)
+
+			self.fuel -= self.consts["fuel_consumption"]
+			if self.fuel < 0:
+				self.fuel = 0
+				self.control_engine(turn_on=False)
+
 		else:
 			self.thrust.zeros()
 
@@ -170,13 +189,18 @@ class Rocket:
 		# if so, reset velocity and thrust.
 		if self.draw_pos.y + self.img_height > self.scene.height - self.scene.ground_height:
 			self.draw_pos.y = self.scene.height - self.scene.ground_height - self.img_height
-			self.reset_movement()
-			# TODO: add collision notification/class boolean datamember called 'is_dead'
+			# self.reset_movement()
+			self.is_dead = True
+
+		self.update_center_pos()
 		
 	def update(self):
 		"""
 		Functionally updates the acceleration, velocity and position of rocket.
 		"""
+		if self.is_dead:
+			return
+
 		self.update_thrust()
 		self.update_velocity()
 		self.update_position()
@@ -193,8 +217,8 @@ class Rocket:
 		like me to extend this comment to include more information about it,
 		or ask me directly if you're curious -satchit
 		"""
+
 		self.scene.app.pushMatrix()
-		self.update_center_pos()
 		self.scene.app.translate(self.center_pos.x, self.center_pos.y)
 		self.scene.app.rotate(self.rotation)
 
@@ -202,11 +226,32 @@ class Rocket:
 			self.update_fire_coords()
 			self.fire_img = self.scene.app.loadImage(self.fire_img_path)
 			self.scene.app.image(self.fire_img, self.fire_x, self.fire_y, self.fire_img_width, self.fire_img_height)
+		
 
 		self.rocket_img = self.scene.app.loadImage(self.rocket_img_path) 
 		self.scene.app.image(self.rocket_img, -self.img_width/2, -self.img_height/2, self.img_width, self.img_height)
+		self.scene.app.ellipse(0, 0, 10, 10)
+
 		self.scene.app.popMatrix()
 
+
+	########## Scoring System ##########
+
+	def get_relative_rotation(self):
+		return min(abs(self.rotation), abs(2*math.pi-self.rotation))
+
+	def get_tared_out_distance(self): 
+		# min distance score is now 0, not 50
+		return abs(self.img_height/2 - self.center_pos.dist(self.scene.target_center))
+
+	def score(self, scaled = True):
+		distance = self.get_tared_out_distance()
+		vel = self.vel.mag()
+		rot = self.get_relative_rotation()
+		
+		fuel = 100-self.fuel
+
+		return distance + vel + score
 
 	########## Data export ##########
 
@@ -225,5 +270,15 @@ class Rocket:
 		self.data['engine'] = self.engine_on
 		self.data['x_target'] = self.scene.target_center.x
 		self.data['y_target'] = self.scene.target_center.y
+		self.data['fuel'] = self.fuel
 
 		return self.data
+
+	def get_data_list(self, normalized=True):
+		ls = list(self.get_data().values())
+		if normalized:
+			ls = list(normalize(ls))
+		return ls
+
+	def __lt__(self, other):
+		return self.score() < other.score()
