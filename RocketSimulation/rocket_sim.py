@@ -8,6 +8,18 @@ from controller import RocketController
 from FNN import ControllerNetwork
 from extras import Vector
 
+from datetime import datetime
+
+##### CHANGE YOUR NAME HERE #####
+
+player_name = 'andreea'
+
+
+cur_time = datetime.now()
+test_time = cur_time.strftime('%Y%m%dT%H%M')
+subdir = 'saved_runs/'
+print(f"Current time: {cur_time.strftime('%X')}")
+
 continual_draw = True
 n_rockets = 1
 
@@ -25,8 +37,6 @@ cur_frame = 0
 saved_data = False
 
 ns = {}
-
-list_of_keys = []
 
 for c in controls:
 	ns[c] = 0
@@ -52,12 +62,6 @@ while(True):
 			continue
 
 		decision = cn.get_decision(rocket.get_data_list())
-		key = rockets[0].scene.app.key
-		if key in controls:
-			list_of_keys.append(rockets[0].scene.app.key)
-		else:
-			list_of_keys.append("p")
- 
 		controller.control(decision)
 		ns[decision]+=1
 		rocket.update()
@@ -68,33 +72,19 @@ while(True):
 
 		with open('scores.txt', 'w') as f:
 			for i in range(len(rockets)):
-
-				# if rockets[i].center_pos.x!=135:
-				# 	print(rockets[i].score(), rockets[i].center_pos)
 				scores.append(rockets[i].score())
 				f.write(f'{i}: {rockets[i].score()}\n')
+
+		# assuming one rocket for now
+		for controller in controllers:
+			controller.save_to_file(f'{subdir}/{player_name}_save_{test_time}.csv')
+
 		saved_data = True
 		print(ns)
 		print(min(scores), max(scores))
 		print('Saved score data!')
 		print("Don't forget to close the game panel!")
-		print(cur_frame)
-		print("Save data? T/F")
-		answer = input()
-		if(answer == 'T'):
-			save_data_to_file()
-			print("Data saved")
+		
 	
 	if continual_draw:
 		scene.draw()
-  
-	def save_data_to_file():
-		f = open('data_for_training.csv', 'a')
-		writer = csv.writer(f)
-		input_data = rocket.get_data_list()
-		output_data = list_of_keys
-		writer.writerow(input_data + output_data)
-		# writer.writerow(output_data)
-
-		f.close()
-	

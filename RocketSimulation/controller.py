@@ -49,6 +49,11 @@ class RocketController:
 		# since it does nothing at the start of
 		# a rocket simulation.
 		self.last_function = self.engine_off
+
+		#andreea pls add comments thx
+		self.physical_history = []
+		self.control_history = []
+		self.save_history = self.physical_control
 	
 	##### Control functions #####
 
@@ -86,6 +91,7 @@ class RocketController:
 		"""
 		if self.physical_control:
 			self.parse_keyboard_input()
+
 		else:
 			if key is not None:
 				self.parse_virtual_input(key)
@@ -101,7 +107,7 @@ class RocketController:
 		self.__press_key__(self.scene.app.key)
 	
 	##### Executes behavior change in rocket #####
-##
+
 	def __press_key__(self, key):
 		if key in self.controls.keys():
 			self.last_function = self.controls[str(key)]
@@ -110,3 +116,24 @@ class RocketController:
 
 		self.last_function()
   
+		if self.save_history:
+			self.record_to_list(key)
+
+	##### Save history to file #####
+
+	def record_to_list(self, key):
+		self.physical_history.append(list(self.rocket.get_data().values()))
+		if key not in self.controls.keys():
+			key = 'p'
+		self.control_history.append(key)
+
+	def save_to_file(self, filename):
+		f = open(filename, 'w')
+		f.write(f'Success: {self.rocket.check_success()}\n')
+		f.write(",".join(list(self.rocket.get_data().keys())))
+		f.write(",key\n")
+		for i in range(len(self.control_history)):
+			f.write(",".join(str(x) for x in self.physical_history[i]))
+			f.write(',')
+			f.write(self.control_history[i])
+			f.write('\n')	

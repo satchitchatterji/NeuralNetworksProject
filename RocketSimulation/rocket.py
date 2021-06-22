@@ -261,7 +261,16 @@ class Rocket:
 		if recalc or self._score is None:
 			self.calc_score()
 
-		return self._score		
+		return self._score
+
+	def check_success(self):
+		return (self.is_dead 
+				and (self.get_relative_rotation() < np.pi/12) 
+				and (self.vel.mag() < 2)
+				and (abs(self.center_pos.x - self.scene.target_center.x) < self.scene.target_size/2)
+				and (abs(self.center_pos.y - self.scene.target_center.y) < self.img_height+10)
+				)
+
 	########## Data export ##########
 
 	def get_data(self):
@@ -275,7 +284,7 @@ class Rocket:
 		self.data['y_vel'] = self.vel.y
 		self.data['x_thrust'] = self.thrust.x
 		self.data['y_thrust'] = self.thrust.y
-		self.data['rotation'] = self.rotation
+		self.data['rotation'] = self.get_relative_rotation()
 		self.data['engine'] = self.engine_on
 		self.data['x_target'] = self.scene.target_center.x
 		self.data['y_target'] = self.scene.target_center.y
