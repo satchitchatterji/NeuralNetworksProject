@@ -1,5 +1,6 @@
 from processing_py import *
 from random import uniform
+import csv
 
 from scene import Scene
 from rocket import Rocket
@@ -25,6 +26,8 @@ saved_data = False
 
 ns = {}
 
+list_of_keys = []
+
 for c in controls:
 	ns[c] = 0
 scores = []
@@ -49,6 +52,11 @@ while(True):
 			continue
 
 		decision = cn.get_decision(rocket.get_data_list())
+		key = rockets[0].scene.app.key
+		if key in controls:
+			list_of_keys.append(rockets[0].scene.app.key)
+		else:
+			list_of_keys.append("p")
  
 		controller.control(decision)
 		ns[decision]+=1
@@ -71,6 +79,22 @@ while(True):
 		print('Saved score data!')
 		print("Don't forget to close the game panel!")
 		print(cur_frame)
+		print("Save data? T/F")
+		answer = input()
+		if(answer == 'T'):
+			save_data_to_file()
+			print("Data saved")
 	
 	if continual_draw:
 		scene.draw()
+  
+	def save_data_to_file():
+		f = open('data_for_training.csv', 'a')
+		writer = csv.writer(f)
+		input_data = rocket.get_data_list()
+		output_data = list_of_keys
+		writer.writerow(input_data + output_data)
+		# writer.writerow(output_data)
+
+		f.close()
+	

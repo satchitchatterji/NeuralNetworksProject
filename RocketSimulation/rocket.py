@@ -251,7 +251,7 @@ class Rocket:
 		
 		fuel = 100-self.fuel
 
-		return distance + vel + score
+		return distance + vel
 
 	########## Data export ##########
 
@@ -282,3 +282,5 @@ class Rocket:
 
 	def __lt__(self, other):
 		return self.score() < other.score()
+
+

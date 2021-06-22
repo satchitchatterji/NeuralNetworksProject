@@ -1,0 +1,22 @@
+
+20210528T1745,Gens:20,Rockets:100
+20210528T1758,Gens:20,Rockets:100
+20210528T1805,Gens:20,Rockets:100 = random Rockets
+20210528T1830,Gens:20,Rockets:10
+20210528T1832,Gens:20,Rockets:100 = lr=0.1
+20210528T1835,Gens:20,Rockets:100 = lr =0.001
+20210528T1838,Gens:30,Rockets:150
+20210528T1841,Gens:30,Rockets:150
+20210528T1849,Gens:30,Rockets:150
+20210528T1856,Gens:10,Rockets:150
+20210601T1106,Gens:20,Rockets:100 normal
+20210601T1112,Gens:50,Rockets:100 random target pos
+20210601T1122,Gens:50,Rockets:100  start_pos=Vector(600,100)
+20210601T1131,Gens:60,Rockets:100 start_pos=Vector(350,100)
+20210601T1140,Gens:100,Rockets:50 random start_pos+target
+20210601T1149,Gens:100,Rockets:50
+20210601T1213,Gens: 100, Rockets: 100, Rocket with added fuel consumption and biases (zero init), Run time: 	270.344551
+20210601T1226,Gens: 100, Rockets: 100, Rocket with added fuel consumption and biases (zero init), Run time: 	292.524616
+20210601T1559,Gens: 100, Rockets: 50, Rocket with added fuel consumption and biases (zero init), Run time: 	165.103809
+20210622T1208,Gens: 100, Rockets: 50, Rocket with added fuel consumption and biases (zero init), Run time: 	134.068572
+20210622T1309,Gens: 100, Rockets: 50, Rocket with added fuel consumption and biases (zero init), Run time: 	130.985954
