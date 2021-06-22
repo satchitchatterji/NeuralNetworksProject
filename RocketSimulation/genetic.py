@@ -29,6 +29,7 @@ class ControllerPopulation:
 
 	def calc_fitnesses(self):
 		self.fitnesses = [p.rocket.score() for p in self.controllers]
+		print(min(self.fitnesses))
 		# print([p.rocket.get_relative_rotation() for p in self.controllers])
 		sd = min(self.fitnesses)/3
 		

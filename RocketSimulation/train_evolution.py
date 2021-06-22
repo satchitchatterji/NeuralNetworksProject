@@ -10,6 +10,7 @@ from genetic import ControllerPopulation
 import pickle
 import numpy as np
 from datetime import datetime
+from trial import run_multi_trials
 
 cur_time = datetime.now()
 test_time = cur_time.strftime('%Y%m%dT%H%M')
@@ -19,6 +20,7 @@ print(f"Current time: {cur_time.strftime('%X')}")
 
 generations = 20
 n_rockets = 50
+n_trials = 10 # number of random trials per generation
 
 notes = f"Only velocity score"
 
@@ -43,54 +45,20 @@ mean_scores = []
 sd_scores = []
 min_scores = []
 
-
 for i_generation in range(generations):
-
 
 	print(f'Generation {i_generation}')
 	controller_population = ControllerPopulation(controllers, cns)
+	
+	scores = run_multi_trials(n_trials, scene, rockets, controllers, cns, init='random')
 
-	frames = 60*20 # 20 seconds at 60 fps
-	cur_frame = 0
-	saved_data = False
-	scores = []
+	for r in range(len(rockets)):
+		rockets[r].set_score(scores[r])
 
-	while(True):
-
-		if saved_data:
-			scene.draw()
-			break
-
-		cur_frame+=1
-		if cur_frame>frames:
-			print('Timeout!')
-			for rocket in rockets:
-				rocket.is_dead = True
-
-		for i in range(len(rockets)):
-			rocket = rockets[i]
-			controller  = controllers[i]
-			cn = cns[i]
-
-			if rocket.is_dead:
-				continue
-
-			decision = cn.get_decision(rocket.get_data_list())
-
-			controller.control(decision)
-			rocket.update()
-
-		deaths = sum([r.is_dead for r in rockets])
-		if deaths == len(rockets):
-			print("\nAll rockets dead!")
-			scores = [r.score() for r in rockets]
-			mean_scores.append(sum(scores)/len(scores))
-			min_scores.append(min(scores))
-			sd_scores.append(np.std(scores))
-			saved_data = True
-
-		if continual_draw:
-			scene.draw()
+	mean_scores.append(sum(scores)/len(scores))
+	min_scores.append(min(scores))
+	sd_scores.append(np.std(scores))
+	print(min(scores))
 	
 	if i_generation != generations - 1:
 		cns = controller_population.reproduce()

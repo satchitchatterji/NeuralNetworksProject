@@ -60,6 +60,7 @@ class Rocket:
 		# data accessible of rocket, see method self::get_data 
 		# for the list of values currently exported
 		self.data = {}
+		self._score = None
 
 	def get_start_pos(self, init = 'random'):
 		"""
@@ -244,15 +245,23 @@ class Rocket:
 		# min distance score is now 0, not 50
 		return abs(self.img_height/2 - self.center_pos.dist(self.scene.target_center))
 
-	def score(self, scaled = True):
+	def calc_score(self, recalc=True):
 		distance = self.get_tared_out_distance()
 		vel = self.vel.mag()
 		rot = self.get_relative_rotation()
 		
 		fuel = 100-self.fuel
 
-		return distance + vel
+		self._score = distance + vel + fuel
 
+	def set_score(self, val):
+		self._score = val
+
+	def score(self, recalc=False):
+		if recalc or self._score is None:
+			self.calc_score()
+
+		return self._score		
 	########## Data export ##########
 
 	def get_data(self):
@@ -282,5 +291,3 @@ class Rocket:
 
 	def __lt__(self, other):
 		return self.score() < other.score()
-
-
