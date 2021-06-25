@@ -270,7 +270,7 @@ class Rocket:
 		return self._score
 
 	def check_success(self):
-	return (self.is_dead 
+		return (self.is_dead
 			and (self.get_relative_rotation() < np.pi/12) 
 			and (self.vel.mag() < 2)
 			and (abs(self.center_pos.x - self.scene.target_center.x) < self.scene.target_size/2)
