@@ -60,6 +60,7 @@ class Rocket:
 		# data accessible of rocket, see method self::get_data 
 		# for the list of values currently exported
 		self.data = {}
+		self.score_mult = np.array([10, 0, 0, 0]) # relative importance of distance, vel, rot, fuel
 		self._score = None
 
 	def get_start_pos(self, init = 'random'):
@@ -67,6 +68,7 @@ class Rocket:
 		Generates starting positon of rocket.
 		switch init:
 			case 'center': return (center of screen, placed upon ground)
+			case 'air_center' : return (center of screen, placed in air)
 			case 'random': return (random, random) within init_limits
 			case type(init)==Vector: return init
 			default: return (0,0)
@@ -74,6 +76,8 @@ class Rocket:
 		if init == 'center':
 			return Vector(self.scene.width/2 - self.img_width/2, 
 						  self.scene.height - self.scene.ground_height - self.img_height)
+		elif init == 'air_center':
+			return Vector(self.scene.width/2 - self.img_width/2, self.img_height)
 		elif init == 'random':
 			x = uniform(*self.consts["init_lims_x"]) - self.img_width/2
 			y = uniform(*self.consts["init_lims_y"])
@@ -92,15 +96,11 @@ class Rocket:
 		"""
 		self.rotation = 0
 
-	def reset_position(self, init = 'random'):
+	def reset_position(self):
 		"""
 		Re-place rocket wherever it was initially initialised
 		"""
-		if init == 'random':
-			self.draw_pos = self.get_start_pos()
-		else:
-			self.draw_pos = self.consts["init_pos"]
-		
+		self.draw_pos = self.consts["init_pos"]
 		self.update_center_pos()
 
 	def reset_movement(self):
@@ -126,7 +126,7 @@ class Rocket:
 
 	def control_engine(self, turn_on=True):
 		if turn_on:
-			if self.fuel>0:
+			if self.fuel > 0:
 				self.engine_on = True
 		else:
 			self.engine_on = False
@@ -253,27 +253,29 @@ class Rocket:
 		distance = self.get_tared_out_distance()
 		vel = self.vel.mag()
 		rot = self.get_relative_rotation()
-		
 		fuel = 100-self.fuel
-
-		self._score = distance + vel + fuel
+		dependables = np.array([distance, vel, rot, fuel])
+		self._score = np.dot(dependables, self.score_mult)
 
 	def set_score(self, val):
 		self._score = val
 
 	def score(self, recalc=False):
+		# update data
+		self.get_data()
+
 		if recalc or self._score is None:
 			self.calc_score()
 
 		return self._score
 
 	def check_success(self):
-		return (self.is_dead 
-				and (self.get_relative_rotation() < np.pi/12) 
-				and (self.vel.mag() < 2)
-				and (abs(self.center_pos.x - self.scene.target_center.x) < self.scene.target_size/2)
-				and (abs(self.center_pos.y - self.scene.target_center.y) < self.img_height+10)
-				)
+	return (self.is_dead 
+			and (self.get_relative_rotation() < np.pi/12) 
+			and (self.vel.mag() < 2)
+			and (abs(self.center_pos.x - self.scene.target_center.x) < self.scene.target_size/2)
+			and (abs(self.center_pos.y - self.scene.target_center.y) < self.img_height+10)
+			)
 
 	########## Data export ##########
 
@@ -296,7 +298,7 @@ class Rocket:
 
 		return self.data
 
-	def get_data_list(self, normalized=True):
+	def get_data_list(self, normalized=False):
 		ls = list(self.get_data().values())
 		if normalized:
 			ls = list(normalize(ls))

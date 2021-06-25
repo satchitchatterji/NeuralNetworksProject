@@ -31,11 +31,13 @@ def run_single_trial(scene, rockets, controllers, cns, init, frames, continual_d
 
 		deaths = sum([r.is_dead for r in rockets])
 		if deaths == len(rockets):
-			scene.draw()
+			# scene.draw()
 			
 			print("All rockets dead!")
 			scores = [r.score(recalc=True) for r in rockets]
-			
+			print(f"rocket target: {rockets[0].data['x_target']}")
+			print(f"rocket final pos: {rockets[0].center_pos.x}, {rockets[0].center_pos.y}")
+			print(f'Min trial score: {min(scores)}')
 			return scores
 
 		if continual_draw:
@@ -47,5 +49,7 @@ def run_multi_trials(n_trials, scene, rockets, controllers, cns, init=None, fram
 	for _ in range(n_trials):
 		cur_scores = run_single_trial(scene, rockets, controllers, cns, init, frames, continual_draw)
 		scores = np.add(scores, np.array(cur_scores)/n_trials)
+		for rocket in rockets:
+			rocket.reset_all()
 	return scores
 	

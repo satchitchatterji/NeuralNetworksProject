@@ -9,8 +9,15 @@ class Layer:
 
 	def __init__(self, n_inputs, n_neurons):
 		self.weights = np.random.randn(n_inputs, n_neurons)
-		# self.biases = np.random.randn(1, n_neurons)
-		self.biases = np.zeros((1, n_neurons))
+		self.biases = np.random.randn(1, n_neurons)
+		# self.biases = np.zeros((1, n_neurons))
+		self.activation_f = self.sigmoid
+
+	def relu(self, x):
+		return np.maximum(0, x)
+
+	def sigmoid(self, x):
+		return (1/(1 + np.exp(-x)))
 
 	def set_parameters(self, weights, biases):
 		self.weights = weights
@@ -20,7 +27,7 @@ class Layer:
 		return self.weights, self.biases
 
 	def forward(self, inputs):
-		self.outputs = np.dot(inputs, self.weights) + self.biases
+		self.outputs = self.activation_f(np.dot(inputs, self.weights) + self.biases)
 
 class ControllerNetwork:
 	def __init__(self, n_inputs, n_outputs, single_layer=True):
@@ -28,6 +35,8 @@ class ControllerNetwork:
 		self.controls = n_outputs
 		self.layers = []
 		if single_layer:
+			self.add_layer(n_inputs, n_inputs)
+			# self.add_layer(n_inputs, n_inputs)
 			self.add_layer(n_inputs, len(n_outputs))
 		# you can add more layers here
 		# make sure the nth layer ouput is the

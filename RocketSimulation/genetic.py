@@ -31,7 +31,7 @@ class ControllerPopulation:
 		self.fitnesses = [p.rocket.score() for p in self.controllers]
 		print(min(self.fitnesses))
 		# print([p.rocket.get_relative_rotation() for p in self.controllers])
-		sd = min(self.fitnesses)/3
+		sd = min(self.fitnesses)/2
 		
 		if sum(self.fitnesses) == 0 or 'nan' in str(self.fitnesses):
 			self.fitnesses = np.array([1]*self.pop_len)
@@ -124,8 +124,8 @@ class ControllerPopulation:
 	def mutate_nn_weights_biases(self, nn, rate, sigma):
 		for i in range(len(nn.layers)):
 			weights = self.mutate_array(nn.layers[i].weights, rate, sigma)
-			biases = self.mutate_array(nn.layers[i].biases, rate, sigma)
-			# biases = nn.layers[i].biases
+			# biases = self.mutate_array(nn.layers[i].biases, rate, sigma)
+			biases = nn.layers[i].biases
 			nn.set_layer_parameters(layer=i, weights=weights, biases=biases)
 
 

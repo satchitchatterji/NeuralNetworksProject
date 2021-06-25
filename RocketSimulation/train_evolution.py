@@ -14,13 +14,13 @@ from trial import run_multi_trials
 
 cur_time = datetime.now()
 test_time = cur_time.strftime('%Y%m%dT%H%M')
-subdir = 'tests/'
+subdir = 'tests'
 print(f"Current time: {cur_time.strftime('%X')}")
 
 
-generations = 20
-n_rockets = 50
-n_trials = 10 # number of random trials per generation
+generations = 100
+n_rockets = 100
+n_trials = 15 # number of random trials per generation
 
 notes = f"Only velocity score"
 
@@ -30,13 +30,13 @@ continual_draw = False
 
 
 scene = Scene(1000, 1000, init_target_val = 800)
-rockets = [Rocket(scene, start_pos=Vector(100,100)) for _ in range(n_rockets)]
+rockets = [Rocket(scene, start_pos='air_center') for _ in range(n_rockets)]
 
 for rocket in rockets:
 	rocket.rotation = np.pi
 
 input_len = len(rockets[0].get_data_list())
-controls = ['w',' ', 's', 'a', 'd']
+controls = ['w',' ', 's', 'a', 'd', 'p']
 
 controllers = [RocketController(rocket, physical_control = False) for rocket in rockets]
 cns = [ControllerNetwork(input_len, controls) for _ in range(n_rockets)]
@@ -50,7 +50,7 @@ for i_generation in range(generations):
 	print(f'Generation {i_generation}')
 	controller_population = ControllerPopulation(controllers, cns)
 	
-	scores = run_multi_trials(n_trials, scene, rockets, controllers, cns, init='random')
+	scores = list(run_multi_trials(n_trials, scene, rockets, controllers, cns, init='random', continual_draw = continual_draw))
 
 	for r in range(len(rockets)):
 		rockets[r].set_score(scores[r])
@@ -59,12 +59,10 @@ for i_generation in range(generations):
 	min_scores.append(min(scores))
 	sd_scores.append(np.std(scores))
 	print(min(scores))
-	
+
 	if i_generation != generations - 1:
 		cns = controller_population.reproduce()
 
-	for rocket in rockets:
-		rocket.reset_all()
 
 s_scores = sorted(scores)
 s_cns = []
