@@ -13,6 +13,9 @@ class Layer:
 		# self.biases = np.zeros((1, n_neurons))
 		self.activation_f = self.sigmoid
 
+	def tanh(self, x):
+		return np.tanh(x)
+
 	def relu(self, x):
 		return np.maximum(0, x)
 
