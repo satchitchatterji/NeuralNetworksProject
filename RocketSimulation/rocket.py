@@ -32,16 +32,19 @@ class Rocket:
 		self.is_dead = False # if the rocket has crashed or landed, it is dead
 
 		# rocket image data, numbers are only wrt the image itself
-		self.rocket_img_path = os.getcwd()+'/rocket.png'
-		self.rocket_img = self.scene.app.loadImage(self.rocket_img_path)
 		self.img_height = 100
 		self.img_width = 0.7*self.img_height
 
 		# fire image data, numbers are only wrt the image itself
-		self.fire_img_path = os.getcwd()+'/fire.png'
-		self.fire_img = self.scene.app.loadImage(self.fire_img_path)
 		self.fire_img_width = 0.25 * self.img_width
 		self.fire_img_height = 10/9 * self.fire_img_width
+
+		# load the images
+		if self.scene.is_drawn:
+			self.rocket_img_path = os.getcwd()+'/rocket.png'
+			self.rocket_img = self.scene.app.loadImage(self.rocket_img_path)
+			self.fire_img_path = os.getcwd()+'/fire.png'
+			self.fire_img = self.scene.app.loadImage(self.fire_img_path)
 
 		# a few constants that tend not to change over the lifetime of the rocket
 		# these need not be constants, but it makes sense that they are 
@@ -222,6 +225,9 @@ class Rocket:
 		like me to extend this comment to include more information about it,
 		or ask me directly if you're curious -satchit
 		"""
+
+		if not self.scene.is_drawn:
+			return
 
 		self.scene.app.pushMatrix()
 		self.scene.app.translate(self.center_pos.x, self.center_pos.y)

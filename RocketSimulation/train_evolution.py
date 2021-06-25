@@ -29,7 +29,7 @@ notes = f'Gens: {generations}, Rockets: {n_rockets}, ' + notes
 continual_draw = False
 
 
-scene = Scene(1000, 1000, init_target_val = 800)
+scene = Scene(1000, 1000, init_target_val = 800, is_drawn=False)
 rockets = [Rocket(scene, start_pos='air_center') for _ in range(n_rockets)]
 
 for rocket in rockets:

@@ -20,8 +20,15 @@ class Scene:
 
 	########## Initialisations ##########
 
-	def __init__(self, width, height, init_target_val = 'random'):
-		self.app = App(width, height)
+	def __init__(self, width, height, init_target_val = 'random', is_drawn = True):
+		
+		self.is_drawn = is_drawn
+		# decide whether or not to draw the scene incl rockets onto the screen
+		# if the control is automated, the movements will be far far faster
+		# if this is false.
+		if self.is_drawn:
+			self.app = App(width, height)
+
 		self.width = width
 		self.height = height
 		self.ground_height = 20 # height of the ground from the bottom of window
@@ -33,10 +40,6 @@ class Scene:
 		self.target_lims = (0, self.width-self.target_size) # limits of where the target is initialised
 		self.init_target(init_target_val)
 
-		# decide whether or not to draw the rockets onto the screen
-		# if the control is automated, the movements will be far far
-		# faster if this is False
-		self.draw_rockets_to_screen = True
 
 	def init_target(self, init_val = 'random'):
 		if init_val == 'random':
@@ -62,12 +65,10 @@ class Scene:
 		"""
 		Draws rocket(s) to the screen if
 		the list of rockets is not empty
-		and self.draw_rockets is true
 		"""
 		if self.rockets:
-			if self.draw_rockets_to_screen:
-				for rocket in self.rockets:
-					rocket.draw()
+			for rocket in self.rockets:
+				rocket.draw()
 
 	########## Draw scene ##########
 
@@ -104,6 +105,9 @@ class Scene:
 		updated OUTISDE of this scene (though it could be better
 		to add it here? Lemme know).
 		"""
+		if not self.is_drawn:
+			return
+
 		self.draw_background()
 		self.draw_ground()
 		self.draw_target()

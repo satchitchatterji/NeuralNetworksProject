@@ -30,6 +30,10 @@ class RocketController:
 		self.rocket = rocket
 		self.scene = self.rocket.scene
 		self.physical_control = physical_control
+		
+		if not self.check_valid_physical():
+			print("ERROR: Physical input is only compatible with drawing to screen!")
+			raise Exception
 
 		self.controls = {}
 		self.controls['w'] = self.engine_on
@@ -107,6 +111,13 @@ class RocketController:
 				print("Invalid key input")
 
 	##### Various input functions #####
+
+	def check_valid_physical(self):
+		# the keyboard is only registered
+		# if the scene is drawn to screen
+		if self.physical_control:
+			return self.scene.is_drawn
+		return True
 
 	def parse_virtual_input(self, key):
 		self.__press_key__(key)
