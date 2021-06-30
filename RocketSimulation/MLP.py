@@ -72,7 +72,7 @@ def train():
  
 	
 	# clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
-	clf = MLPClassifier(hidden_layer_sizes=(11, 5), random_state=1, max_iter=500, learning_rate_init=0.0001, alpha=0.01, warm_start=True,
+	clf = MLPClassifier(hidden_layer_sizes=(11), random_state=1, max_iter=500, learning_rate_init=0.0001, alpha=0.01, warm_start=True,
                      early_stopping=True, activation='tanh').fit(training_data_input, training_data_output)
 	# loss_values = clf.loss_curve_
 	# plt.plot(loss_values)
