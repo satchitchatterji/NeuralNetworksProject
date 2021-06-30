@@ -12,6 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+from MLP_tnsrfl import neural_network_model
+
 save_plots=False
 save_path='flight_paths'
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -38,77 +40,81 @@ files = ['abc']
 for file_ref in files:
 	print(f'file_ref = {file_ref}')
 	
-	try:
-		# put your own controller here
-		# ideally it should have a get_decision method
-		# so that it'll just be plug and play by
-		# changing just one line of code.
-		# Else, feel free to change the code as you need to.
+	# try:
+	# put your own controller here
+	# ideally it should have a get_decision method
+	# so that it'll just be plug and play by
+	# changing just one line of code.
+	# Else, feel free to change the code as you need to.
+	
+	# cn = pickle.load(open(f'tests/sorted_cn_list_{file_ref}.pickle', 'rb'))[0]
+	# cn = MLP_wrapper(pickle.load(open('test_backprop1.pickle', 'rb')))
+	model_name = "tsfl/20210630T1931.model"
+	model = neural_network_model(input_size = 11)
+	model.load(model_name, weights_only=True)
+	cn = MLP_wrapper(model)
+
+	paths_x = []
+	paths_y = []
+	scores = []
+	test_targets = range(0,1001,25)
+
+	for i in test_targets:
+		paths_x.append([])
+		paths_y.append([])
+
+		scene = Scene(1000, 1000, init_target_val = i, is_drawn=False)
+		rocket = Rocket(scene, start_pos='air_center')
+		controller = RocketController(rocket, physical_control = False)
+		rocket.score_mult = np.array(score_weights)
+
+		frames = 60*60
+		cur_frame = 0
+
+		while(True):
+			cur_frame+=1
+			if cur_frame>frames:
+				# print('Timeout!')
+				rocket.is_dead = True
+
+			if not rocket.is_dead:
+				decision = cn.get_decision(rocket.get_data_list())
+				controller.control(decision)
+				rocket.update()
+				paths_x[-1].append(rocket.center_pos.x)
+				paths_y[-1].append(1000-rocket.center_pos.y)
+
+			else:
+				# print("\nAll rockets dead!")
+				scores.append(rocket.score())
+				break
+
+	fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(12,5.4))
+	ax1.plot(test_targets, scores)
+	ax1.set_title('Performance over target locations (starting from air_center)')
+	ax1.set_xlabel('Target position')
+	ax1.set_ylabel('Distance')
+	ax1.grid(True)
+
+
+	i=0
+	for path_x, path_y in zip(paths_x, paths_y):
+		ax2.plot(path_x, path_y, color=colors[i%10])
+		# ax2.scatter([test_targets[i]], [0], color=colors[i%10], marker='.')
+		ax2.plot([path_x[-1], test_targets[i]], [path_y[-1], 0], color=colors[i%10], alpha=0.5)
 		
-		# cn = pickle.load(open(f'tests/sorted_cn_list_{file_ref}.pickle', 'rb'))[0]
-		cn = MLP_wrapper(pickle.load(open('test_backprop1.pickle', 'rb')))
+		i+=1
+	# temp_r=Rocket(scene, start_pos='air_center')
+	# ax2.scatter([temp_r.center_pos.x], [1000-temp_r.center_pos.y], marker='x', color='black')
+	
+	ax2.set_title('Flight paths')
+	ax2.set_xlim(0,1000)
 
-		paths_x = []
-		paths_y = []
-		scores = []
-		test_targets = range(0,1001,25)
+	if save_plots:
+		plt.savefig(f'{save_path}/{file_ref}_distance_flight_path.png')
 
-		for i in test_targets:
-			paths_x.append([])
-			paths_y.append([])
+	plt.show()
 
-			scene = Scene(1000, 1000, init_target_val = i, is_drawn=False)
-			rocket = Rocket(scene, start_pos='air_center')
-			controller = RocketController(rocket, physical_control = False)
-			rocket.score_mult = np.array(score_weights)
-
-			frames = 60*60
-			cur_frame = 0
-
-			while(True):
-				cur_frame+=1
-				if cur_frame>frames:
-					# print('Timeout!')
-					rocket.is_dead = True
-
-				if not rocket.is_dead:
-					decision = cn.get_decision(rocket.get_data_list())
-					controller.control(decision)
-					rocket.update()
-					paths_x[-1].append(rocket.center_pos.x)
-					paths_y[-1].append(1000-rocket.center_pos.y)
-
-				else:
-					# print("\nAll rockets dead!")
-					scores.append(rocket.score())
-					break
-
-		fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(12,5.4))
-		ax1.plot(test_targets, scores)
-		ax1.set_title('Performance over target locations (starting from air_center)')
-		ax1.set_xlabel('Target position')
-		ax1.set_ylabel('Distance')
-		ax1.grid(True)
-
-
-		i=0
-		for path_x, path_y in zip(paths_x, paths_y):
-			ax2.plot(path_x, path_y, color=colors[i%10])
-			# ax2.scatter([test_targets[i]], [0], color=colors[i%10], marker='.')
-			ax2.plot([path_x[-1], test_targets[i]], [path_y[-1], 0], color=colors[i%10], alpha=0.5)
-			
-			i+=1
-		# temp_r=Rocket(scene, start_pos='air_center')
-		# ax2.scatter([temp_r.center_pos.x], [1000-temp_r.center_pos.y], marker='x', color='black')
-		
-		ax2.set_title('Flight paths')
-		ax2.set_xlim(0,1000)
-
-		if save_plots:
-			plt.savefig(f'{save_path}/{file_ref}_distance_flight_path.png')
-
-		plt.show()
-
-	except Exception as e:
-		print(e)
-		print('Error!')
+	# except Exception as e:
+	# 	print(e)
+	# 	print('Error!')

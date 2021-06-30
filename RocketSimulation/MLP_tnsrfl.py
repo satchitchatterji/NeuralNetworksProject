@@ -110,7 +110,7 @@ def train_model(training_data_input, training_data_output, model=False):
 	if not model:
 		model = neural_network_model(input_size = len(X[0]))
 	
-	model.fit({'input': X}, {'targets': y}, n_epoch = 3, snapshot_step = 500, show_metric = True, shuffle = True)
+	model.fit({'input': X}, {'targets': y}, n_epoch = 5, snapshot_step = 500, show_metric = True, shuffle = True)
 	return model
 
 
@@ -145,29 +145,26 @@ def show_game(model):
 			choices.count(2)/len(choices), choices.count(3)/len(choices), choices.count(4)/len(choices), choices.count(5)/len(choices)))
 	print('Average Score:',sum(scores)/len(scores))
 
+if __name__ == '__main__':
+	train = True # True if you want to train a model, False if you want to load an already saved one
+	model_name = "tsfl/20210630T1907.model" # the name of the model you want to load (if train is True this is ignored)
 
-train = False # True if you want to train a model, False if you want to load an already saved one
-model_name = "tsfl/20210630T1007.model" # the name of the model you want to load (if train is True this is ignored)
+	list_games = get_successful_games()
+	print("Number of games: ", len(list_games))
+	training_data_input = separate_input_output()[0]
+	training_data_output = separate_input_output()[1]
 
-list_games = get_successful_games()
-print("Number of games: ", len(list_games))
-training_data_input = separate_input_output()[0]
-training_data_output = separate_input_output()[1]
+	if train:
+		model = train_model(training_data_input, training_data_output)
+		model.save(f'tsfl/{test_time}.model')
+	else:
+		model = neural_network_model(input_size = len(training_data_input[0]))
+		model.load(model_name, weights_only=True)
 
-if train:
-	model = train_model(training_data_input, training_data_output)
-	model.save(f'tsfl/{test_time}.model')
-else:
-	model = neural_network_model(input_size = len(training_data_input[0]))
-	model.load(model_name, weights_only=True)
-
-show_game(model)
-
-# 20210630T0908 -> 100 epochs with regular format
-# 20210630T1007 -> 200 eposchs with regular format; falls to the ground
-# 20210630T1103 -> Satchit games, 100 epochs (sucks)
-# 20210630T1114
-
-
-
-
+	# show_game(model)
+	
+	# 
+	# 20210630T0908 -> 100 epochs with regular format
+	# 20210630T1007 -> 200 eposchs with regular format; falls to the ground
+	# 20210630T1103 -> Satchit games, 100 epochs (sucks)
+	# 20210630T1114
