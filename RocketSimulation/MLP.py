@@ -3,6 +3,8 @@ import csv
 import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime
+from sklearn import preprocessing
+from sklearn.decomposition import PCA
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
@@ -65,28 +67,34 @@ def train():
 	training_data_output = separate_input_output()[1]
 
 	#X_train, X_test, y_train, y_test = train_test_split(training_data_input, training_data_output, test_size = 0.33, random_state=1)
-	print(len(training_data_input))
 
-	# scaler = MinMaxScaler()
-	# training_data_input = scaler.fit_transform(training_data_input)
+	# training_data_input = scale_data(training_data_input)
+ 
 	
 	# clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
-	clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
-	loss_values = clf.loss_curve_
-	plt.plot(loss_values)
-	plt.show()
+	clf = MLPClassifier(hidden_layer_sizes=(11, 5), random_state=1, max_iter=500, learning_rate_init=0.0001, alpha=0.01, warm_start=True,
+                     early_stopping=True, activation='tanh').fit(training_data_input, training_data_output)
+	# loss_values = clf.loss_curve_
+	# plt.plot(loss_values)
+	# plt.show()
+ 
+	print("accuracy:", clf.score(training_data_input, training_data_output))
 	return clf
 
 def get_move(move):
 	dict_output = {0: 'w', 1: ' ', 2: 's', 3: 'a', 4: 'd', 5: 'p'}
-	print(move[0])
 	return dict_output[move[0]]
+
+
+def scale_data(data):
+	scaler = preprocessing.StandardScaler()
+	return scaler.fit_transform(data)
 
 
 def main(clf):
 	# taken from Satchit's code
-	scene = Scene(1000, 1000, init_target_val = 'random')
-	rocket = Rocket(scene, start_pos=Vector(100,100))
+	scene = Scene(1000, 1000, init_target_val = 400)
+	rocket = Rocket(scene, start_pos='random')
 	controller = RocketController(rocket, physical_control = False)
 
 	cur_frame = 0
@@ -102,6 +110,7 @@ def main(clf):
 			break
 
 		game_state = rocket.get_data_list()
+		# game_state = scale_data([game_state])
 		decision = get_move(clf.predict([game_state]))
 		controller.control(decision)
 		rocket.update()
@@ -109,10 +118,19 @@ def main(clf):
 
 
 if __name__ == "__main__":
-	clf = train()
-
+    
 	cur_time = datetime.now()
 	test_time = cur_time.strftime('%Y%m%dT%H%M')
-	pickle.dump(clf, open(f'mlp_sklearn/{test_time}.pickle', 'wb'))
+ 
+	tr = True
+  
+	file_ref = '20210630T1917'
+
+	if tr:
+		clf = train()
+		pickle.dump(clf, open(f'mlp_sklearn/{test_time}.pickle', 'wb'))
+	else:
+		clf = pickle.load(open(f'mlp_sklearn/{file_ref}.pickle', 'rb'))
+		clf.get
 	
-	#main(clf)
+	main(clf)
