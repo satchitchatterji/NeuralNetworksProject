@@ -1,14 +1,17 @@
 import glob
 import csv
+import matplotlib.pyplot as plt
+import pickle
+from datetime import datetime
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 from scene import Scene
 from rocket import Rocket
 from controller import RocketController
 from extras import Vector
-import pickle
 
 def get_successful_games():
 	list_success = []
@@ -27,7 +30,7 @@ def format_input(row):
 		try:
 			formatted_row.append(float(element))
 		except ValueError:
-			if element == "True":
+			if element == "False":
 				formatted_row.append(float(1))
 			else:
 				formatted_row.append(float(0))
@@ -58,15 +61,20 @@ def separate_input_output():
 def train():
 	list_games = get_successful_games()
 	print("Number of successful games: ", len(list_games))
-	training_data_input = []
-	training_data_output = []
 	training_data_input = separate_input_output()[0]
 	training_data_output = separate_input_output()[1]
 
 	#X_train, X_test, y_train, y_test = train_test_split(training_data_input, training_data_output, test_size = 0.33, random_state=1)
 	print(len(training_data_input))
 
-	clf = MLPClassifier(random_state=1, max_iter=300).fit(training_data_input, training_data_output)
+	# scaler = MinMaxScaler()
+	# training_data_input = scaler.fit_transform(training_data_input)
+	
+	# clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
+	clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
+	loss_values = clf.loss_curve_
+	plt.plot(loss_values)
+	plt.show()
 	return clf
 
 def get_move(move):
@@ -77,7 +85,7 @@ def get_move(move):
 
 def main(clf):
 	# taken from Satchit's code
-	scene = Scene(1000, 1000, init_target_val = 300)
+	scene = Scene(1000, 1000, init_target_val = 'random')
 	rocket = Rocket(scene, start_pos=Vector(100,100))
 	controller = RocketController(rocket, physical_control = False)
 
@@ -102,5 +110,9 @@ def main(clf):
 
 if __name__ == "__main__":
 	clf = train()
-	pickle.dump(clf, open('test_backprop1.pickle', 'wb'))
-	# main(clf)
+
+	cur_time = datetime.now()
+	test_time = cur_time.strftime('%Y%m%dT%H%M')
+	pickle.dump(clf, open(f'mlp_sklearn/{test_time}.pickle', 'wb'))
+	
+	#main(clf)

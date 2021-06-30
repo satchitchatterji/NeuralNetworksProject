@@ -1,8 +1,4 @@
-
-
-
-
-
+import numpy as np
 
 class MLP_wrapper:
 	def __init__(self, mlp):
@@ -14,4 +10,8 @@ class MLP_wrapper:
 		return dict_output[move[0]]
 
 	def get_decision(self, inputs):
-		return self.get_move(self.mlp.predict([inputs]))
+		try:
+			return self.get_move(self.mlp.predict([inputs]))
+		except Exception:
+			inputs = np.array(inputs).reshape(-1, len(inputs), 1)
+			return self.get_move(np.argmax(self.mlp.predict([inputs])))
