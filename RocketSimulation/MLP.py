@@ -8,6 +8,7 @@ from scene import Scene
 from rocket import Rocket
 from controller import RocketController
 from extras import Vector
+import pickle
 
 def get_successful_games():
 	list_success = []
@@ -101,4 +102,5 @@ def main(clf):
 
 if __name__ == "__main__":
 	clf = train()
-	main(clf)
+	pickle.dump(clf, open('test_backprop1.pickle', 'wb'))
+	# main(clf)
