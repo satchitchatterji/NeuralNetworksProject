@@ -79,22 +79,7 @@ def neural_network_model(input_size):
 	network = input_data(shape=[None, input_size, 1], name='input')
 
 	network = fully_connected(network, 11, activation='relu')
-	network = dropout(network, 0.8) # not sure what this does yet but seemed important
-
-	# network = fully_connected(network, 128, activation='relu')
-	# network = dropout(network, 0.8)
-
-	# network = fully_connected(network, 256, activation='relu')
-	# network = dropout(network, 0.8)
-
-	# network = fully_connected(network, 512, activation='relu')
-	# network = dropout(network, 0.8)
-
-	# network = fully_connected(network, 256, activation='relu')
-	# network = dropout(network, 0.8)
-
-	# network = fully_connected(network, 128, activation='relu')
-	# network = dropout(network, 0.8)
+	network = dropout(network, 0.8) 
 
 	network = fully_connected(network, 6, activation='softmax')
 	network = regression(network, optimizer='adam', learning_rate=LR, loss='categorical_crossentropy', name='targets')
@@ -110,7 +95,7 @@ def train_model(training_data_input, training_data_output, model=False):
 	if not model:
 		model = neural_network_model(input_size = len(X[0]))
 	
-	model.fit({'input': X}, {'targets': y}, n_epoch = 5, snapshot_step = 500, show_metric = True, shuffle = True)
+	model.fit({'input': X}, {'targets': y}, n_epoch = 15, batch_size = 128, snapshot_step = 500, show_metric = True, shuffle = True, validation_set = 0.1)
 	return model
 
 
@@ -161,10 +146,4 @@ if __name__ == '__main__':
 		model = neural_network_model(input_size = len(training_data_input[0]))
 		model.load(model_name, weights_only=True)
 
-	# show_game(model)
-	
-	# 
-	# 20210630T0908 -> 100 epochs with regular format
-	# 20210630T1007 -> 200 eposchs with regular format; falls to the ground
-	# 20210630T1103 -> Satchit games, 100 epochs (sucks)
-	# 20210630T1114
+	show_game(model)
