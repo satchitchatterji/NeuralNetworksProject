@@ -14,6 +14,11 @@ from rocket import Rocket
 from controller import RocketController
 from extras import Vector
 
+
+"""
+The main class for the tensorflow MLP classifier, trained with 152 successful games
+"""
+
 LR = 1e-3 # learning rate, might want to play around with
 cur_time = datetime.now()
 test_time = cur_time.strftime('%Y%m%dT%H%M')
@@ -132,7 +137,7 @@ def show_game(model):
 
 if __name__ == '__main__':
 	train = True # True if you want to train a model, False if you want to load an already saved one
-	model_name = "tsfl/20210630T1907.model" # the name of the model you want to load (if train is True this is ignored)
+	model_name = "tsfl_models/20210630T1907.model" # the name of the model you want to load (if train is True this is ignored)
 
 	list_games = get_successful_games()
 	print("Number of games: ", len(list_games))
@@ -141,7 +146,7 @@ if __name__ == '__main__':
 
 	if train:
 		model = train_model(training_data_input, training_data_output)
-		model.save(f'tsfl/{test_time}.model')
+		model.save(f'tsfl_models/{test_time}.model')
 	else:
 		model = neural_network_model(input_size = len(training_data_input[0]))
 		model.load(model_name, weights_only=True)
