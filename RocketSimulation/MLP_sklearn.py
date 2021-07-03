@@ -1,19 +1,21 @@
 import glob
 import csv
-import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime
 from sklearn import preprocessing
-from sklearn.decomposition import PCA
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
 
 from scene import Scene
 from rocket import Rocket
 from controller import RocketController
 from extras import Vector
+
+"""
+The main class for the sklearn MLP classifier, trained with 152 successful games
+"""
+
 
 def get_successful_games():
 	list_success = []
@@ -66,17 +68,8 @@ def train():
 	training_data_input = separate_input_output()[0]
 	training_data_output = separate_input_output()[1]
 
-	#X_train, X_test, y_train, y_test = train_test_split(training_data_input, training_data_output, test_size = 0.33, random_state=1)
-
-	# training_data_input = scale_data(training_data_input)
- 
-	
-	# clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
 	clf = MLPClassifier(hidden_layer_sizes=(11), random_state=1, max_iter=500, learning_rate_init=0.0001, alpha=0.01, warm_start=True,
                      early_stopping=True, activation='tanh').fit(training_data_input, training_data_output)
-	# loss_values = clf.loss_curve_
-	# plt.plot(loss_values)
-	# plt.show()
  
 	print("accuracy:", clf.score(training_data_input, training_data_output))
 	return clf
@@ -92,7 +85,6 @@ def scale_data(data):
 
 
 def main(clf):
-	# taken from Satchit's code
 	scene = Scene(1000, 1000, init_target_val = 400)
 	rocket = Rocket(scene, start_pos='random')
 	controller = RocketController(rocket, physical_control = False)
@@ -128,9 +120,8 @@ if __name__ == "__main__":
 
 	if tr:
 		clf = train()
-		pickle.dump(clf, open(f'mlp_sklearn/{test_time}.pickle', 'wb'))
+		pickle.dump(clf, open(f'sklearn_models/{test_time}.pickle', 'wb'))
 	else:
-		clf = pickle.load(open(f'mlp_sklearn/{file_ref}.pickle', 'rb'))
-		clf.get
+		clf = pickle.load(open(f'sklearn_models/{file_ref}.pickle', 'rb'))
 	
 	main(clf)
