@@ -1,7 +1,3 @@
-
-
-
-
 import numpy as np
 from processing_py import *
 from random import uniform
@@ -15,6 +11,8 @@ from FNN import ControllerNetwork
 from extras import Vector, normalize
 
 class ControllerPopulation:
+	# population of controller MLPs as defined in
+	# FNN.py with methods to reproduce
 	def __init__(self, controller_list, nn_list):
 		self.controllers = controller_list
 		self.population = nn_list

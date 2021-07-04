@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-from MLP_tnsrfl import neural_network_model
+from MLP_tensorflow import neural_network_model
 
 save_plots=False
 save_path='flight_paths'
@@ -48,11 +48,13 @@ for file_ref in files:
 	# Else, feel free to change the code as you need to.
 	
 	# cn = pickle.load(open(f'tests/sorted_cn_list_{file_ref}.pickle', 'rb'))[0]
-	# cn = MLP_wrapper(pickle.load(open('test_backprop1.pickle', 'rb')))
-	model_name = "tsfl/20210630T1931.model"
+	
+	model_name='20210704T1606'
 	model = neural_network_model(input_size = 11)
-	model.load(model_name, weights_only=True)
-	cn = MLP_wrapper(model)
+	model.load(f'tsfl_models/{model_name}.model', weights_only=True)
+	scaler = pickle.load(open(f"tsfl_models/{model_name}_scaler.pkl",'rb'))
+
+	cn = MLP_wrapper(model,scaler)
 
 	paths_x = []
 	paths_y = []

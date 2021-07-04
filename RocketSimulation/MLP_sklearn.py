@@ -1,21 +1,23 @@
 import glob
 import csv
+import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime
-from sklearn import preprocessing
 
+import numpy as np
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 from scene import Scene
 from rocket import Rocket
 from controller import RocketController
 from extras import Vector
+scaler = MinMaxScaler()
 
 """
 The main class for the sklearn MLP classifier, trained with 152 successful games
 """
-
 
 def get_successful_games():
 	list_success = []
@@ -67,26 +69,29 @@ def train():
 	print("Number of successful games: ", len(list_games))
 	training_data_input = separate_input_output()[0]
 	training_data_output = separate_input_output()[1]
+	scaler.fit(training_data_input)
+	training_data_input = scaler.transform(training_data_input)
+	
+	#X_train, X_test, y_train, y_test = train_test_split(training_data_input, training_data_output, test_size = 0.33, random_state=1)
+	print(len(training_data_input))
 
-	clf = MLPClassifier(hidden_layer_sizes=(11), random_state=1, max_iter=500, learning_rate_init=0.0001, alpha=0.01, warm_start=True,
-                     early_stopping=True, activation='tanh').fit(training_data_input, training_data_output)
- 
-	print("accuracy:", clf.score(training_data_input, training_data_output))
+	# clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
+	clf = MLPClassifier(random_state=1, max_iter=1000).fit(training_data_input, training_data_output)
+	loss_values = clf.loss_curve_
+	plt.plot(loss_values)
+	plt.show()
 	return clf
 
 def get_move(move):
 	dict_output = {0: 'w', 1: ' ', 2: 's', 3: 'a', 4: 'd', 5: 'p'}
+	print(move[0])
 	return dict_output[move[0]]
 
 
-def scale_data(data):
-	scaler = preprocessing.StandardScaler()
-	return scaler.fit_transform(data)
-
-
 def main(clf):
-	scene = Scene(1000, 1000, init_target_val = 400)
-	rocket = Rocket(scene, start_pos='random')
+	# taken from Satchit's code
+	scene = Scene(1000, 1000, init_target_val = 'random')
+	rocket = Rocket(scene, start_pos=Vector(100,100))
 	controller = RocketController(rocket, physical_control = False)
 
 	cur_frame = 0
@@ -101,27 +106,23 @@ def main(clf):
 		if rocket.is_dead:
 			break
 
-		game_state = rocket.get_data_list()
-		# game_state = scale_data([game_state])
-		decision = get_move(clf.predict([game_state]))
+		game_state = np.array(rocket.get_data_list()).reshape(1, -1)
+		game_state = scaler.transform(game_state)
+		decision = get_move(clf.predict(game_state))
 		controller.control(decision)
 		rocket.update()
 		scene.draw()
 
 
 if __name__ == "__main__":
-    
-	cur_time = datetime.now()
-	test_time = cur_time.strftime('%Y%m%dT%H%M')
- 
-	tr = True
-  
-	file_ref = '20210630T1917'
+	# clf = train()
+	#
+	# cur_time = datetime.now()
+	# test_time = cur_time.strftime('%Y%m%dT%H%M')
+	# pickle.dump(clf, open(f'mlp_sklearn/{test_time}.pickle', 'wb'))
+	# pickle.dump(clf, open(f'mlp_sklearn/{test_time}_scaler.pickle', 'wb'))
 
-	if tr:
-		clf = train()
-		pickle.dump(clf, open(f'sklearn_models/{test_time}.pickle', 'wb'))
-	else:
-		clf = pickle.load(open(f'sklearn_models/{file_ref}.pickle', 'rb'))
-	
+	model_name = "20210703T1207"
+	scaler = pickle.load(open(f'sklearn_models/{model_name}_scaler.pickle', 'rb'))
+	clf = pickle.load(open(f'sklearn_models/{model_name}.pickle', 'rb'))
 	main(clf)
