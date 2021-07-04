@@ -20,3 +20,41 @@
 20210601T1559,Gens: 100, Rockets: 50, Rocket with added fuel consumption and biases (zero init), Run time: 	165.103809
 20210622T1208,Gens: 100, Rockets: 50, Rocket with added fuel consumption and biases (zero init), Run time: 	134.068572
 20210622T1309,Gens: 100, Rockets: 50, Rocket with added fuel consumption and biases (zero init), Run time: 	130.985954
+*** new runs on google colab ***
+20210627T1548,Gens: 100, Rockets: 100, Trials: 20, Automated Colab run: score_weights = [1,0,0,0], Run time: 	3694.740655
+20210627T1707,Gens: 100, Rockets: 50, Trials: 10, Automated Colab run: score_weights = [1,0,0,0], Run time: 	633.311712
+20210627T1722,Gens: 100, Rockets: 50, Trials: 10, Automated Colab run: score_weights = [1,0,0,0], Run time: 	754.327938
+20210627T1752,Gens: 150, Rockets: 100, Trials: 10, Automated Colab run: score_weights = [10,5,5,0], Run time: 	1924.209611
+20210627T1824,Gens: 150, Rockets: 100, Trials: 20, Automated Colab run: score_weights = [10,5,5,0], Run time: 	3674.552643
+20210627T1943,Gens: 200, Rockets: 100, Trials: 15, Automated Colab run: score_weights = [5,10,5,0], Run time: 	6929.611174
+20210627T2227,Gens: 250, Rockets: 150, Trials: 20, Automated Colab run: score_weights = [6,10,10,0], Run time: 	8231.249414
+20210628T0739,Gens: 250, Rockets: 150, Trials: 20, Automated Colab run: score_weights = [5,10,10,2], Run time: 	21187.899037
+20210628T2244,Gens: 600, Rockets: 100, Trials: 20, Automated Colab run: score_weights = [5,10,10,2], Run time: 	16746.222158
+20210629T0750,Gens: 60, Rockets: 100, Trials: 10, Automated Colab run: score_weights = [5,10,10,2], Run time: 	607.164545
+20210629T0804,Gens: 60, Rockets: 100, Trials: 10, Automated Colab run: identity instead of tanh, score_weights = [5,10,10,2], Run time: 	602.158043
+20210629T0816,Gens: 100, Rockets: 100, Trials: 15, Automated Colab run: identity instead of tanh, 3 layers, score_weights = [5,10,10,2], Run time: 	1503.94033
+20210629T0847,Gens: 150, Rockets: 100, Trials: 20, Automated Colab run: score_weights = [1,1,1,0], Run time: 	5894.344241
+20210629T1045,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: More training for prev NNs, sigma: 0.05->0.15, score_weights = [1,1,1,0], Run time: 	999.581564
+20210629T1104,Gens: 50, Rockets: 100, Trials: 20, Automated Colab run: relu activation, sigma: 0.1, score_weights = [1,1,1,0], Run time: 	1533.820673
+20210629T1133,Gens: 50, Rockets: 100, Trials: 20, Automated Colab run: more runs for prev relu run, sigma:0.1, score_weights = [1,1,1,0], Run time: 	1221.628005
+20210629T1159,Gens: 100, Rockets: 100, Trials: 10, Automated Colab run: relu run, new non-random scene init training regeme, score_weights = [1,1,1,0], Run time: 	1229.329969
+20210629T1253,Gens: 100, Rockets: 100, Trials: 10, Automated Colab run: NEW relu run, new non-random scene init training regeme, ignore the last one since it extended 1108 run, score_weights = [1,1,1,0], Run time: 	2594.745533
+20210629T1346,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs, sigma=0.2, score_weights = [1,1,1,0], Run time: 	1338.871318
+20210629T1509,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs, sigma=0.75, score_weights = [1,1,1,0], Run time: 	901.091725
+20210629T1527,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs, sigma=0.5, score_weights = [1,1,1,0], Run time: 	722.320218
+20210629T1543,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1346, sigma=0.5, score_weights = [1,1,1,0], Run time: 	1312.741898
+20210629T1610,Gens: 25, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1543, sigma=0.75, score_weights = [1,1,1,0], Run time: 	452.44536
+20210629T1629,Gens: 25, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1543, sigma=0.6, score_weights = [1,1,1,0], Run time: 	700.895541
+20210629T1642,Gens: 25, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1543, sigma=0.6, score_weights = [1,0,0,0], Run time: 	659.977974
+20210629T1751,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1642, sigma=0.3, score_weights = [1,0,0,0], Run time: 	1391.290558
+20210629T1817,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1751, sigma=0.15, score_weights = [1,0,0,0], Run time: 	1400.944906
+20210629T1843,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1817, sigma=0.07, score_weights = [1,0,0,0], Run time: 	1439.065275
+20210630T0447,Gens: 500, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210629T1527 to explore diff behaviour, sigma=0.1, score_weights = [1,0,0,0], Run time: 	6262.241956
+20210630T0807,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210630T0447 to explore diff behaviour, sigma=0.5, score_weights = [1,0,0,0], Run time: 	724.918386
+20210630T0935,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Additional relu runs starting from 20210630T0807 to explore diff behaviour, sigma=0.5, score_weights = [1,0,0,0], Run time: 	730.375247
+20210630T1501,Gens: 150, Rockets: 100, Trials: 10, Automated Colab run: New run with additional key p, sigma=0.5, score_weights = [1,1,1,0], Run time: 	2227.455413
+20210630T1552,Gens: 150, Rockets: 100, Trials: 10, Automated Colab run: Continuation of 20210630T1501, sigma=0.75, score_weights = [1,1,1,0], Run time: 	2089.695154
+20210630T1634,Gens: 150, Rockets: 100, Trials: 10, Automated Colab run: Continuation of 20210630T1501, sigma=0.75, score_weights = [1,1,1,0], Run time: 	2006.635263
+20210630T1728,Gens: 150, Rockets: 100, Trials: 10, Automated Colab run: Continuation of 20210630T1634, sigma=0.75, score_weights = [1,0,0,0], Run time: 	1969.056912
+20210630T1802,Gens: 150, Rockets: 100, Trials: 10, Automated Colab run: Continuation of 20210630T1728, sigma=0.75, score_weights = [1,0,0,0], Run time: 	1926.036604
+20210630T1958,Gens: 50, Rockets: 100, Trials: 10, Automated Colab run: Continuation of 20210630T1802, sigma=1.00, score_weights = [1,0,0,0], Run time: 	644.956562
