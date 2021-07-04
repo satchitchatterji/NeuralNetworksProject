@@ -59,6 +59,8 @@ class RocketController:
 		self.physical_history = []
 		self.control_history = []
 		self.save_history = self.physical_control
+
+		self.first_key = True
 	
 	##### Control functions #####
 
@@ -88,6 +90,7 @@ class RocketController:
 			self.rocket.reset_all()
 		self.reset_history()
 		self.last_function = self.engine_off
+		self.first_key = True
 
 	def control(self, key = None):
 		"""
@@ -128,14 +131,15 @@ class RocketController:
 	##### Executes behavior change in rocket #####
 
 	def __press_key__(self, key):
-		if key in self.controls.keys():
+		if self.first_key:
+			if key == 'r':
+				pass
+			else:
+				self.first_key = False
+		elif key in self.controls.keys():
 			self.last_function = self.controls[str(key)]
 		else:
 			pass
-
-		if key == 'r':
-			if self.control_history and self.control_history[-1] == 'r':
-				self.last_function = self.engine_off
 
 		self.last_function()
   
@@ -171,7 +175,8 @@ class RocketController:
 		self.reset_history()
 
 
-		############### REMOVE THIS ###################
 		########### This is only for single player mode #########
 		if self.physical_control:
 			self.scene.init_target('random')
+			self.rocket.consts["init_pos"] = self.rocket.get_start_pos('random')
+			self.last_function = self.engine_off
