@@ -39,13 +39,14 @@ You can play another game directly by pressing 'r'. Right after you land, the ta
 
 You can just close the pop up panel when you are done playing.
 
+Thanks for playing!
+
 Note: There is a very small chance that you could get an error that looks like this:
 
 `The file "C:\Users\Satchit Chatterji\Desktop\FinalCodeVerssion\NeuralNetworksProject-main\RocketSimulation/rocket.png" is missing or inaccessible, make sure the URL is valid or that the file has been added to your sketch and is readable.`
 Unfortunately the processing-py library used (https://github.com/FarukHammoud/processing_py) is limited and occasionally unstable for unclear reasons. Try redownloading or rebooting, it should fix the issue.
 
-Thanks for playing!
-
+If not, this video is an example run: https://youtu.be/zxtcC-INAH0
 
 ## Questions/Feedback
 
